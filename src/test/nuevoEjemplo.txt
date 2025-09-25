@@ -1,0 +1,14 @@
+var x = 10;
+var y = 20;
+var str = "Hola Mundo";
+if(x >= 10 && y <= 20){
+   y = y + 1;
+   z = x - y * 2 / 3 % 4;
+   flag = true || false;
+   arr[0] = arr[1];
+   objeto.propiedad = 'cadena';
+   if (x != y){
+      resultado = (x + y);
+$
+   }
+}

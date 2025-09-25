@@ -1,75 +1,68 @@
+// ================== Funciones de Archivos ==================
+function importarArchivo() {
+  const input = document.getElementById("fileInput");
+  input.click();
+  input.onchange = () => {
+    const file = input.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById("codigoFuente").value = e.target.result;
+      };
+      reader.readAsText(file);
+    }
+  };
+}
+
+function guardarArchivo() {
+  const contenido = document.getElementById("codigoFuente").value;
+  const blob = new Blob([contenido], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "nuevoEjemplo.txt";
+  link.click();
+}
+
+function limpiar() {
+  document.getElementById("codigoFuente").value = "";
+  document.querySelector("#tablaTokens tbody").innerHTML = "";
+  document.getElementById("errores").innerHTML = "";
+}
+
 // Implementación de analizador Léxico en JavaScript
-function isLetter(char) {
-    return /[a-zA-Z]/.test(char);
-}
+function isLetter(char) { return /[a-zA-Z]/.test(char); }
+function isNumber(char) { return /[0-9]/.test(char); }
+function isWhitespace(char) { return /\s/.test(char); }
 
-function isNumber(char) {
-    return /[0-9]/.test(char);
-}
+function analizar() {
+  let codigoFuente = document.getElementById("codigoFuente").value;
+  let puntero = 0;
+  let tokens = [];
+  let errores = [];
+  let palabras_reservadas = ["true","false"];
 
-function isWhitespace(char) {
-    return /\s/.test(char);
-}
-
-function eliminarEspacios() {
+  function eliminarEspacios() {
     while (puntero < codigoFuente.length && isWhitespace(codigoFuente[puntero])) {
-        puntero++;
+      puntero++;
     }
-}
+  }
 
-function importarArchivo(ruta) {
-    const fs = require('fs');
-    try {
-        const data = fs.readFileSync(ruta, 'utf8');
-        return data;
-    } catch (err) {
-        console.error("Error al leer el archivo:", err);
-        return "";
-    }
-}
-
-var puntero = 0;
-var palabras_reservadas = ["true","false"];
-var codigoFuente = importarArchivo('ejemplo.txt');
-var tokens = [];
-var errores = [];
-while (puntero < codigoFuente.length) {
-    if(errores.length > 0) {
-        break;
-    }
+  while (puntero < codigoFuente.length) {
+    if (errores.length > 0) break;
 
     eliminarEspacios();
-    var caracterActual = codigoFuente[puntero];
+    let caracterActual = codigoFuente[puntero];
+    let start;
+
     switch (caracterActual) {
-        case ";":
-            tokens.push({ tipo: "DELIMITADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "+":
-            tokens.push({ tipo: "OPERADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "-":
-            tokens.push({ tipo: "OPERADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "*":
-            tokens.push({ tipo: "OPERADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "/":
-            tokens.push({ tipo: "OPERADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "(":
-            tokens.push({ tipo: "DELIMITADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case ")":
-            tokens.push({ tipo: "DELIMITADORES", valor: caracterActual, posicion: puntero });
-            puntero++;
-            break;
-        case "=":
+      case ";": case "+": case "-": case "*": case "/":
+      case "(": case ")": case ",": case ".": case "{":
+      case "}": case "[": case "]": case "%":
+        tokens.push({ tipo: "DELIMITADOR/OPERADOR", valor: caracterActual, posicion: puntero });
+        puntero++;
+        break;
+
+      case "=":
             if (codigoFuente[puntero + 1] === "=") {
                 tokens.push({ tipo: "OPERADORES", valor: "==", posicion: puntero });
                 puntero += 2;
@@ -79,7 +72,8 @@ while (puntero < codigoFuente.length) {
                 puntero++;
             }
             break;
-        case ">":
+
+      case ">":
             if (codigoFuente[puntero + 1] === "=") {
                 tokens.push({ tipo: "OPERADORES", valor: ">=", posicion: puntero });
                 puntero += 2;
@@ -89,7 +83,8 @@ while (puntero < codigoFuente.length) {
                 puntero++;
             }
             break;
-        case "<":
+
+      case "<":
             if (codigoFuente[puntero + 1] === "=") {
                 tokens.push({ tipo: "OPERADORES", valor: "<=", posicion: puntero });
                 puntero += 2;
@@ -99,7 +94,8 @@ while (puntero < codigoFuente.length) {
                 puntero++;
             }
             break;
-        case "!":
+
+      case "!":
             if (codigoFuente[puntero + 1] === "=") {
                 tokens.push({ tipo: "OPERADORES", valor: "!=", posicion: puntero });
                 puntero += 2;
@@ -213,10 +209,33 @@ while (puntero < codigoFuente.length) {
                 puntero++;
             }
     }
+  }
+
+  mostrarResultados(tokens, errores);
 }
 
-if(errores.length === 0) {
-    console.log(tokens);
-} else {
-    console.log("Se hayo un error en...", errores);
+function mostrarResultados(tokens, errores) {
+  const tbody = document.querySelector("#tablaTokens tbody");
+  const divErrores = document.getElementById("errores");
+
+  // Limpiamos primero tabla y errores
+  tbody.innerHTML = "";
+  divErrores.innerHTML = "";
+
+  if (errores.length > 0) {
+    // Si hay errores, se muestran únicamente en la sección de errores
+    errores.forEach(e => {
+      divErrores.innerHTML += `<p style="color:red">[${e.posicion}] ${e.tipo}: ${e.valor}</p>`;
+    });
+  } else {
+    // Si no hay errores, se muestran los tokens en la tabla
+    tokens.forEach(t => {
+      let row = `<tr><td>${t.tipo}</td><td>${t.valor}</td><td>${t.posicion}</td></tr>`;
+      tbody.innerHTML += row;
+    });
+  }
 }
+
+
+// ================== Botón Sintáctico (por ahora vacío) ================== 
+function sintactico() { alert("El análisis sintáctico aún no está implementado."); }
