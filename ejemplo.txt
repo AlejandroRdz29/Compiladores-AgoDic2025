@@ -1,0 +1,6 @@
+var x = 10;
+$
+var str = 'Hola Mundo'; 
+if(x >= 10 && y <= 20) { 
+    y = y + 1; 
+}
