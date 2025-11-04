@@ -1,4 +1,8 @@
-// ================== Funciones de Archivos ==================
+// global variables
+var tokens = [];
+
+
+// ----- Funciones de Archivos -----
 function importarArchivo() {
   const input = document.getElementById("fileInput");
   input.click();
@@ -34,7 +38,7 @@ function isLetter(char) { return /[a-zA-Z]/.test(char); }
 function isNumber(char) { return /[0-9]/.test(char); }
 function isWhitespace(char) { return /\s/.test(char); }
 
-function analizar() {
+async function analizar() {
   let codigoFuente = document.getElementById("codigoFuente").value;
   let puntero = 0;
   let tokens = [];
@@ -182,7 +186,7 @@ function analizar() {
                 }
                 if(codigoFuente[puntero] === '"'){
                     var cadena = codigoFuente.substring(start, puntero);
-                    tokens.push({ tipo: "CADENA", valor: cadena, posicion: start - 1 });
+                    tokens.push({ tipo: "STRING", valor: cadena, posicion: start - 1 });
                     puntero++;
                 }
                 else{
@@ -197,7 +201,7 @@ function analizar() {
                 }
                 if(codigoFuente[puntero] === "'"){
                     var cadena = codigoFuente.substring(start, puntero);
-                    tokens.push({ tipo: "CADENA", valor: cadena, posicion: start - 1 });
+                    tokens.push({ tipo: "STRING", valor: cadena, posicion: start - 1 });
                     puntero++;
                 }
                 else{
@@ -210,9 +214,24 @@ function analizar() {
             }
     }
   }
-
-  mostrarResultados(tokens, errores);
+        tokens.push({ tipo: "EOF", valor: "EOF", posicion: puntero+1 });
+        mostrarResultados(tokens, errores);
+        return tokens;
 }
+
+// ----- Función Sintáctico (por ahora comentada) -----
+// async function sintactico(tokens) {
+//     try {
+//         const mod = await import('./ASintactico.js');
+//         if (typeof mod.analizarSintactico === 'function') {
+//             mod.analizarSintactico();
+//         } else if (typeof mod.pr === 'function') {
+//             mod.pr();
+//         }
+//     } catch (e) {
+//         console.error('Error al cargar el módulo sintáctico:', e);
+//     }
+// }
 
 function mostrarResultados(tokens, errores) {
   const tbody = document.querySelector("#tablaTokens tbody");
@@ -237,5 +256,7 @@ function mostrarResultados(tokens, errores) {
 }
 
 
-// ================== Botón Sintáctico (por ahora vacío) ================== 
-function sintactico() { alert("El análisis sintáctico aún no está implementado."); }
+// ----- Botón Sintáctico (por ahora vacío) ----- 
+function sintactico() {
+    console.log("Análisis sintáctico no implementado aún.");
+}
