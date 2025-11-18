@@ -104,7 +104,8 @@ function FunDef(){
 
 // ParamListOpt -> ParamList | ε
 function ParamListOpt(){
-    if(['int','bool','void'].includes(lookahead)){
+    var current = lookahead();
+    if(current && ['int','bool','void'].includes(current.valor)){
         ParamList();
     } else {
         // ε
@@ -120,7 +121,8 @@ function ParamList(){
 
 // ParamListTail -> ',' Param ParamListTail | ε
 function ParamListTail(){
-    if(lookahead === ','){
+    var current = lookahead();
+    if(current && current.valor === ','){
         match(',');
         Param();
         ParamListTail();
@@ -167,33 +169,34 @@ function StmtList(){
 // Stmt -> Block | Decl | ExprStmt | IfStmt | WhileStmt | ForStmt | ReturnStmt | BreakStmt | ContinueStmt
 function Stmt(){
     var current = lookahead();
-    if(lookahead === '{'){
+    if(current && current.valor === '{'){
         Block();
-    } else if(['int','bool','void'].includes(current.valor)){
+    } else if(current && ['int','bool','void'].includes(current.valor)){
         Decl();
-    } else if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(current.valor) || ['NUM','STRING','BOOLEAN'].includes(current.tipo)){
+    } else if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         ExprStmt();
-    } else if(current.valor === 'if'){
+    } else if(current && current.valor === 'if'){
         IfStmt();
-    } else if(current.valor === 'while'){
+    } else if(current && current.valor === 'while'){
         WhileStmt();
-    } else if(current.valor === 'for'){
+    } else if(current && current.valor === 'for'){
         ForStmt();
-    } else if(current.valor === 'return'){
+    } else if(current && current.valor === 'return'){
         ReturnStmt();
-    } else if(current.valor === 'break'){
+    } else if(current && current.valor === 'break'){
         BreakStmt();
-    } else if(current.valor === 'continue'){
+    } else if(current && current.valor === 'continue'){
         ContinueStmt();
     }
 }
 
 // ExprStmt -> Expr ';' | ';'
 function ExprStmt(){
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         Expr();
         match(';');
-    } else if(lookahead() === ';'){
+    } else if(current && current.valor === ';'){
         match(';');
     }
 }
@@ -210,7 +213,8 @@ function IfStmt(){
 
 // ElseOpt -> 'else' Stmt | ε
 function ElseOpt(){
-    if(lookahead() === 'else'){
+    var current = lookahead();
+    if(current && current.valor === 'else'){
         match('else');
         Stmt();
     } else {
@@ -243,7 +247,8 @@ function ForStmt(){
 
 // ForInit -> Expr | ε
 function ForInit(){
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         Expr();
     } else {
         // ε
@@ -253,7 +258,8 @@ function ForInit(){
 
 // ForCond -> Expr | ε
 function ForCond(){
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         Expr();
     } else {
         // ε
@@ -263,7 +269,8 @@ function ForCond(){
 
 // ForIter -> Expr | ε
 function ForIter(){
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         Expr();
     } else {
         // ε
@@ -274,7 +281,8 @@ function ForIter(){
 // ReturnStmt -> 'return' Expr ';' | 'return' ';'
 function ReturnStmt(){
     match('return');
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         Expr();
     }
     match(';');
@@ -305,7 +313,8 @@ function Assign(){
 
 // AssignTail -> '=' Assign | ε
 function AssignTail(){
-    if(lookahead() === '='){
+    var current = lookahead();
+    if(current && current.valor === '='){
         match('=');
         Assign();
     } else {
@@ -322,7 +331,8 @@ function Or(){
 
 // OrTail -> '||' And OrTail | ε
 function OrTail(){
-    if(lookahead() === '||'){
+    var current = lookahead();
+    if(current && current.valor === '||'){
         match('||');
         And();
         OrTail();
@@ -340,7 +350,8 @@ function And(){
 
 // AndTail -> '&&' Eq AndTail | ε
 function AndTail(){
-    if(lookahead() === '&&'){
+    var current = lookahead();
+    if(current && current.valor === '&&'){
         match('&&');
         Eq();
         AndTail();
@@ -358,8 +369,9 @@ function Eq(){
 
 // EqTail -> ('==' | '!=') Rel EqTail | ε
 function EqTail(){
-    if(lookahead() === '==' || lookahead() === '!='){
-        match(lookahead());
+    var current = lookahead();
+    if(current && (current.valor === '==' || current.valor === '!=')){
+        match(current.valor);
         Rel();
         EqTail();
     } else {
@@ -376,8 +388,9 @@ function Rel(){
 
 // RelTail -> ('<' | '<=' | '>' | '>=') Add RelTail | ε
 function RelTail(){
-    if(['<','<=','>','>='].includes(lookahead())){
-        match(lookahead());
+    var current = lookahead();
+    if(current && ['<','<=','>','>='].includes(current.valor)){
+        match(current.valor);
         Add();
         RelTail();
     } else {
@@ -394,8 +407,9 @@ function Add(){
 
 // AddTail -> ('+' | '-') Mul AddTail | ε
 function AddTail(){
-    if(lookahead() === '+' || lookahead() === '-'){
-        match(lookahead());
+    var current = lookahead();
+    if(current && (current.valor === '+' || current.valor === '-')){
+        match(current.valor);
         Mul();
         AddTail();
     } else {
@@ -412,8 +426,9 @@ function Mul(){
 
 // MulTail -> ('*' | '/' | '%') Unary MulTail | ε
 function MulTail(){
-    if(lookahead() === '*' || lookahead() === '/' || lookahead() === '%'){
-        match(lookahead());
+    var current = lookahead();
+    if(current && (current.valor === '*' || current.valor === '/' || current.valor === '%')){
+        match(current.valor);
         Unary();
         MulTail();
     } else {
@@ -424,8 +439,9 @@ function MulTail(){
 
 // Unary -> ('!' | '-') Unary | Postfix
 function Unary(){
-    if(lookahead() === '!' || lookahead() === '-'){
-        match(lookahead());
+    var current = lookahead();
+    if(current && (current.valor === '!' || current.valor === '-')){
+        match(current.valor);
         Unary();
     } else {
         Postfix();
@@ -440,17 +456,18 @@ function Postfix(){
 
 // PostfixTail -> '(' ArgListOpt ')' PostfixTail | '[' Expr ']' PostfixTail | '.' ID PostfixTail | ε
 function PostfixTail(){
-    if(lookahead() === '('){
+    var current = lookahead();
+    if(current && current.valor === '('){
         match('(');
         ArgListOpt();
         match(')');
         PostfixTail();
-    } else if(lookahead() === '['){
+    } else if(current && current.valor === '['){
         match('[');
         Expr();
         match(']');
         PostfixTail();
-    } else if(lookahead().token === '.'){
+    } else if(current && current.valor === '.'){
         match('.');
         match('ID');
         PostfixTail();
@@ -462,17 +479,18 @@ function PostfixTail(){
 
 // Primary -> 'ID' | 'NUM' | 'STRING' | 'true' | 'false' | '(' Expr ')'
 function Primary(){
-    if(lookahead().tipo === 'ID'){
+    var current = lookahead();
+    if(current && current.tipo === 'ID'){
         match('ID');
-    } else if(lookahead().tipo === 'NUM'){
+    } else if(current && current.tipo === 'NUM'){
         match('NUM');
-    } else if(lookahead().tipo === 'STRING'){
+    } else if(current && current.tipo === 'STRING'){
         match('STRING');
-    } else if(lookahead() === 'true'){
+    } else if(current && current.valor === 'true'){
         match('true');
-    } else if(lookahead() === 'false'){
+    } else if(current && current.valor === 'false'){
         match('false');
-    } else if(lookahead() === '('){
+    } else if(current && current.valor === '('){
         match('(');
         Expr();
         match(')');
@@ -481,7 +499,8 @@ function Primary(){
 
 // ArgListOpt -> ArgList | ε
 function ArgListOpt(){
-    if(['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','ID','NUM','STRING','true','false','('].includes(lookahead()) || ['NUM','STRING','BOOLEAN'].includes(lookahead().tipo)){
+    var current = lookahead();
+    if(current && (['=','||','&&','==', '!=', '<','<=','>','>=','+','-','*','/','!','true','false','('].includes(current.valor) || ['NUM','STRING','ID'].includes(current.tipo))){
         ArgList();
     } else {
         // ε
@@ -497,7 +516,8 @@ function ArgList(){
 
 // ArgListTail -> ',' Expr ArgListTail | ε
 function ArgListTail(){
-    if(lookahead() === ','){
+    var current = lookahead();
+    if(current && current.valor === ','){
         match(',');
         Expr();
         ArgListTail();
