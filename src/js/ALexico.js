@@ -1,6 +1,7 @@
-// global variables
-var tokens = [];
+// ----- Variables Globales -----
+var tokensGlobales = [];
 
+// ----- Funciones de Archivos -------
 
 // ----- Funciones de Archivos -----
 function importarArchivo() {
@@ -38,12 +39,12 @@ function isLetter(char) { return /[a-zA-Z]/.test(char); }
 function isNumber(char) { return /[0-9]/.test(char); }
 function isWhitespace(char) { return /\s/.test(char); }
 
-async function analizar() {
+function analizar() {
   let codigoFuente = document.getElementById("codigoFuente").value;
   let puntero = 0;
   let tokens = [];
   let errores = [];
-  let palabras_reservadas = ["true","false"];
+  let palabras_reservadas = ["true","false","int","bool","void","if","else","while","for","return","break","continue"];
 
   function eliminarEspacios() {
     while (puntero < codigoFuente.length && isWhitespace(codigoFuente[puntero])) {
@@ -215,23 +216,20 @@ async function analizar() {
     }
   }
         tokens.push({ tipo: "EOF", valor: "EOF", posicion: puntero+1 });
+        console.log("Tokens generados:", tokens);
+        tokensGlobales = tokens; // Guardamos los tokens en variable global
         mostrarResultados(tokens, errores);
         return tokens;
 }
 
-// ----- Función Sintáctico (por ahora comentada) -----
-// async function sintactico(tokens) {
-//     try {
-//         const mod = await import('./ASintactico.js');
-//         if (typeof mod.analizarSintactico === 'function') {
-//             mod.analizarSintactico();
-//         } else if (typeof mod.pr === 'function') {
-//             mod.pr();
-//         }
-//     } catch (e) {
-//         console.error('Error al cargar el módulo sintáctico:', e);
-//     }
-// }
+// ----- Botón Sintáctico ---------------------------
+function sintactico() {
+    if (tokensGlobales.length === 0) {
+        alert("Primero ejecuta el análisis léxico para generar tokens");
+        return;
+    }
+    analizarSintactico(tokensGlobales);
+}
 
 function mostrarResultados(tokens, errores) {
   const tbody = document.querySelector("#tablaTokens tbody");
@@ -253,10 +251,4 @@ function mostrarResultados(tokens, errores) {
       tbody.innerHTML += row;
     });
   }
-}
-
-
-// ----- Botón Sintáctico (por ahora vacío) ----- 
-function sintactico() {
-    console.log("Análisis sintáctico no implementado aún.");
 }
