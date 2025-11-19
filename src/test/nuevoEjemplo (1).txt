@@ -1,0 +1,23 @@
+var contador = 5;
+var mensaje = "Probando el analizador";
+var activo = false;
+
+if(contador < 10 || activo == true){
+    contador = contador * 2 + 3;
+    datos[2] = valores[contador - 1];
+    usuario.nombre = "Ingrid";
+
+    if(mensaje != "Error"){
+        suma = (contador + 15) / 3;
+        saludo = 'Hola desde el analizador';
+    }
+}
+
+while(contador >= 1){
+    contador = contador - 1;
+    historial[contador] = mensaje;
+}
+
+for(i = 0; i < 4; i = i + 1){
+    arreglo[i] = i * contador;
+}

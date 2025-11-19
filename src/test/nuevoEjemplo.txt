@@ -9,6 +9,5 @@ if(x >= 10 && y <= 20){
    objeto.propiedad = 'cadena';
    if (x != y){
       resultado = (x + y);
-$
    }
 }
